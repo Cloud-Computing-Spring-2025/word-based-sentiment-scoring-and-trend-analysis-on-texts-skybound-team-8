@@ -6,6 +6,7 @@ services:
     container_name: namenode
     volumes:
       - namenode:/hadoop/dfs/name  # Volume mount for HDFS NameNode data
+      - .:/workspace  # Mount the current project directory to /workspace inside the container
     environment:
       - CLUSTER_NAME=test  # Set the cluster name
     env_file:
@@ -125,3 +126,4 @@ volumes:
   datanode2:  # Volume for Datanode 2 data
   datanode3:  # Volume for Datanode 3 data
   pg_data:  # Volume for PostgreSQL data (Hue DB and Hive Metastore DB)
+  
