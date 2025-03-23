@@ -16,27 +16,27 @@
     </properties>
 
     <dependencies>
-        <!-- Hadoop Core: Required for MapReduce jobs -->
+        <!-- Hadoop Core -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
 
-        <!-- MapReduce core functionality (InputFormat, Writable, etc.) -->
+        <!-- MapReduce API -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
 
-        <!-- Stanford CoreNLP (minimal, no heavy models) -->
+        <!-- Stanford CoreNLP (no models) -->
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>${corenlp.version}</version>
             <exclusions>
-                <!-- Exclude models to reduce JAR size -->
+                <!-- Block model jars -->
                 <exclusion>
                     <groupId>edu.stanford.nlp</groupId>
                     <artifactId>stanford-corenlp</artifactId>
@@ -55,7 +55,7 @@
 
     <build>
         <plugins>
-            <!-- Java Compiler -->
+            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -67,7 +67,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Fat JAR creation (with size control) -->
+            <!-- Create lightweight fat JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -81,12 +81,16 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <!-- Optional: remove unused classes -->
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
-                        <goals><goal>single</goal></goals>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
