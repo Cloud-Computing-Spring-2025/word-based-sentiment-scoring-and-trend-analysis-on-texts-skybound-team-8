@@ -10,33 +10,52 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>3.2.1</hadoop.version>
         <corenlp.version>4.5.4</corenlp.version>
     </properties>
 
     <dependencies>
-        <!-- Hadoop Core (minimal MapReduce support) -->
+        <!-- Hadoop Core: Required for MapReduce jobs -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
+
+        <!-- MapReduce core functionality (InputFormat, Writable, etc.) -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
 
-        <!-- Stanford CoreNLP base only -->
+        <!-- Stanford CoreNLP (minimal, no heavy models) -->
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>${corenlp.version}</version>
+            <exclusions>
+                <!-- Exclude models to reduce JAR size -->
+                <exclusion>
+                    <groupId>edu.stanford.nlp</groupId>
+                    <artifactId>stanford-corenlp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>edu.stanford.nlp</groupId>
+                    <artifactId>stanford-corenlp-models</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>edu.stanford.nlp</groupId>
+                    <artifactId>stanford-corenlp-models-current</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Java Compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -44,9 +63,11 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
+            <!-- Fat JAR creation (with size control) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
