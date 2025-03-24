@@ -67,5 +67,137 @@ This retrieves the output from HDFS to the local filesystem for further analysis
 The output from Task 1 will serve as input for subsequent tasks.
 
 ---
+## **Task 2: Word Frequency Analysis with Lemmatization**
+
+### **Objective**
+Computing word frequencies by splitting each sentence into words and applying lemmatization to reduce words to their base forms
+
+### **Steps to Execute Task 1**
+
+#### **1. Start Docker Containers**
+```sh
+docker compose up -d
+```
+This command initializes the Hadoop ecosystem using Docker.
+
+---
+
+#### **2. Building the Java Code with Maven**
+Before running the MapReduce job, compile the Java source files and package them into a JAR file by using maven :
+```sh
+mvn clean install
+```
+This command will generate a JAR file in the target/ directory, which contains your MapReduce code.
+
+---
+
+#### **3. Preparing Input Data Files **
+
+The input that is output from Task1 is located in the output/ folder of the repository.
+
+---
+
+#### **4. Moving the Jar and Input Files to the Docker Container**
+#### **4.1 Moving the JAR File to the Container**
+
+Copy the built JAR file to the ResourceManager container. 
+
+```bash
+docker cp target/word-frequency-lemmatization-1.0-SNAPSHOT-jar-with-dependencies.jar resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
+```
 
 
+#### **4.2 Moving the Input File to the Container**
+
+Next, copy the Word frequency lemmatization dataset to the ResourceManager container:
+
+```bash
+docker cp output/part-r-00000 resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
+```
+---
+
+### 5. **Connect to the ResourceManager Container**
+
+To run the Hadoop commands, we are connected to the ResourceManager container:
+
+```bash
+docker exec -it resourcemanager /bin/bash
+```
+
+Once inside the container, navigated to the Hadoop directory where our files were copied:
+
+```bash
+cd /opt/hadoop-3.2.1/share/hadoop/mapreduce/
+```
+
+---
+
+### 6. **Set Up HDFS for Input File**
+
+To run the MapReduce job, the input file needs to be stored in Hadoop’s distributed file system (HDFS).
+
+#### **6.1 Creating Directories in HDFS**
+
+Created a directory in HDFS for the input file by running the following command:
+
+```bash
+hadoop fs -mkdir -p /input/dataset2
+```
+
+#### **6.2 Uploading the Input File to HDFS**
+
+Uploaded the output of task1 file to HDFS:
+
+```bash
+hadoop fs -put part-r-00000 /input/dataset2/
+```
+
+---
+
+### 7. **Executing the Word Frequency Lemmatization MapReduce Jobs**
+
+Run the job using the following command:
+
+```bash
+hadoop jar /opt/hadoop-3.2.1/share/hadoop/mapreduce/word-frequency-lemmatization-1.0-SNAPSHOT-jar-with-dependencies.jar Task2.WordFreqLemmatizationDriver /input/dataset2/part-r-00000 /output2
+```
+
+This command will execute the MapReduce job with the Cleaned data as the input and store the results in the `/output2` directory in HDFS.
+
+---
+
+### 8. **View the Output of the MapReduce Job**
+
+The output will be stored in multiple directories (one for each task). We can view the output files using the following commands:
+
+```bash
+hadoop fs -ls /output
+```
+
+```bash
+hadoop fs -cat /output/task2/part-r-00000
+```
+---
+
+### 9. **Copy Output from HDFS to Local OS**
+
+Once you have verified the results, copying the output from HDFS to your local file system.
+
+Use the following command to copy the output from HDFS to the Hadoop directory:
+
+```bash
+hdfs dfs -get /output2 /opt/hadoop-3.2.1/share/hadoop/mapreduce/
+```
+Now, exit the ResourceManager container:
+
+```bash
+exit
+```
+This retrieves the output from HDFS to the local filesystem for further analysis
+
+---
+## **Next Steps**
+The output from Task 2 will serve as input for subsequent tasks.
+
+
+---
