@@ -438,6 +438,90 @@ exit
 docker cp resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/output4/ task4/
 ```
 
+#  Task 5: Bigram Analysis using Hive UDF
+
+##  Objective
+To extract and analyze **bigrams** (pairs of consecutive words) from lemmatized text using a custom **Hive User-Defined Function (UDF)** written in Java.
+
+---
+
+## Input Data
+- The output from **Task 2** (lemmatized words per book).
+- Each row contains:  
+  - `book_id`  
+  - `year`  
+  - `clean_text` (lemmatized sentence)
+
+---
+
+##  Tools Used
+- Java 8
+- Apache Hive 2.x
+- Hadoop
+- Maven
+- Dockerized Hive environment
+
+---
+
+##  Steps Performed
+
+### 1. Write the UDF in Java
+- Class: `Task5.BigramUDF`
+- Extends Hive `UDF` class
+- Splits lemmatized text into consecutive word pairs (bigrams)
+
+### 2. Package the UDF
+```bash
+mvn clean package
+```
+### 3. Copy the JAR into the Hive container
+```bash
+docker cp target/word-Trend-Analysis-1.0-SNAPSHOT-jar-with-dependencies.jar hive-server:/tmp/word-udf.jar
+
+```
+### 4. Enter the Hive container & launch Hive
+```bash
+docker exec -it hive-server bash
+hive
+```
+### 5. Register the JAR & Function in Hive
+```sql
+ADD JAR /tmp/word-udf.jar;
+
+CREATE TEMPORARY FUNCTION extract_bigrams AS 'Task5.BigramUDF';
+```
+### 6. Create Hive Table 
+```sql
+CREATE TABLE lemmatized_words (
+  book_id STRING,
+  year INT,
+  clean_text STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t';
+```
+### Load Data into Hive Table
+```sql
+LOAD DATA LOCAL INPATH '/tmp/lemmatized_output.txt' INTO TABLE lemmatized_words;
+```
+### Query to Extract Bigrams
+```sql
+SELECT extract_bigrams(clean_text) FROM lemmatized_words LIMIT 10;
+```
+### Output
+```sql
+SELECT bigram, COUNT(*) 
+FROM (
+  SELECT explode(extract_bigrams(clean_text)) AS bigram 
+  FROM lemmatized_words
+) temp
+GROUP BY bigram
+ORDER BY COUNT(*) DESC
+LIMIT 20;
+```
+
+
+
 
 ### Note:
 We've used the same XML file for Task 2, Task 3, and Task 4, specifying the appropriate class name for each task within the file.
