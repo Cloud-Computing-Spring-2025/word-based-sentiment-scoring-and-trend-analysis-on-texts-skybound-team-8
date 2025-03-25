@@ -203,63 +203,63 @@ The output from Task 2 will serve as input for subsequent tasks.
 ---
 
 
-# Task 4: Trend Analysis & Aggregation
+## Task 4: Trend Analysis & Aggregation
 
-## Objective
+### **Objective**
 Task 4 aims to find long-term trends and possible connections with past events by combining sentiment scores and word frequencies over larger time periods (e.g., by decade). The data will be processed and aggregated using a Hadoop MapReduce operation, which will provide sentiment trends over time.
 
-## Steps to Execute Task 4
+#### **Steps to Execute Task 4**
 
-# 1. Start Docker Containers
+#### **1. Start Docker Containers**
 ```sh
 docker compose up -d
 ```
 
-# 2. Build the Project with Maven
+#### **2. Build the Project with Maven**
 ```sh
 mvn install
 ```
 
-# 3. Access the Resource Manager
+#### **3. Access the Resource Manager**
 ```sh
 docker exec -it resourcemanager bash
 ```
 
-# 4. Create Directory for MapReduce Files
+#### **4. Create Directory for MapReduce Files**
 
 ```sh
 mkdir -p /opt/hadoop-3.2.1/share/hadoop/mapreduce/
 ```
 
 
-# 5. Exit Resource Manager Container
+#### **5. Exit Resource Manager Container**
 
 ```sh
 exit
 ```
 
 
-# 6. Copy JAR File to Resource Manager
+#### **6. Copy JAR File to Resource Manager**
 
 ```sh
 docker cp target/word-Trend-Analysis-1.0-SNAPSHOT.jar resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
 ```
 
-# 7. Copy Task 3 Output to Resource Manager
+#### **7. Copy Task 3 Output to Resource Manager**
 
 ```sh
 docker cp output/task3/part-r-00000 resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
 ```
 
 
-# 8. Reconnect to Resource Manager
+#### **8. Reconnect to Resource Manager**
 
 ```sh
 docker exec -it resourcemanager bash
 ```
 
 
-# 9. Create Input Directory in HDFS
+#### **9. Create Input Directory in HDFS**
 
 ```sh
 cd /opt/hadoop-3.2.1/share/hadoop/mapreduce/
@@ -267,35 +267,35 @@ hadoop fs -mkdir -p /input/dataset4
 ```
 
 
-# 10. Upload Task 3 Output to HDFS
+#### **10. Upload Task 3 Output to HDFS**
 
 ```sh
 hadoop fs -put part-r-00000 /input/dataset4
 ```
 
 
-# 11. Run the MapReduce Job for Task 4
+#### **11. Run the MapReduce Job for Task 4**
 
 ```sh
 hadoop jar /opt/hadoop-3.2.1/share/hadoop/mapreduce/word-Trend-Analysis-1.0-SNAPSHOT.jar Task4.WordTrendAnalysisDriver /input/dataset4/part-r-00000 /output4
 ```
 
 
-# 12. Retrieve Output from HDFS
+#### **12. Retrieve Output from HDFS**
 
 ```sh
 hdfs dfs -get /output4 /opt/hadoop-3.2.1/share/hadoop/mapreduce/
 ```
 
 
-# 13. Exit the Resource Manager Container
+#### **13. Exit the Resource Manager Container**
 
 ```sh
 exit
 ```
 
 
-# 14. Copy the Output to Local System
+#### **14. Copy the Output to Local System**
 
 ```sh
 docker cp resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/output4/ task4/
